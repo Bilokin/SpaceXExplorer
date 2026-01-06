@@ -41,8 +41,8 @@ class MainManager(object):
             msg = 'Choose an action by typing number and pressing ENTER:'
             choice = self.ui_manager.ask_user_choice(
                 msg, self.main_choices, ask_exit=True)
-            print('Choice', choice)
             if choice is None:
-                self.ui_manager.say(f'Answer {choice} not correct, please try again!')
+                self.ui_manager.say(f'Input was not valid, please'
+                                    ' enter a valid number!')
                 continue
             self.main_menu[choice][1]()
