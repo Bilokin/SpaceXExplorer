@@ -1,14 +1,4 @@
-> [!IMPORTANT]
-> This template is **archived**.  
-> UV can now [generate a sample project](https://docs.astral.sh/uv/guides/projects/#creating-a-new-project)  
-> I recommend using **UV** to bootstrap your peojects.  
-> [Copier](https://github.com/copier-org/copier) is a tools that can bootstrap projects from templates.  
-
-
----
-
-
-# Python Project Template
+# SpaceX Explorer Project
 
 A low dependency and really simple to start project template for Python Projects.
 
