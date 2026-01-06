@@ -42,7 +42,7 @@ class MainManager(object):
             choice = self.ui_manager.ask_user_choice(
                 msg, self.main_choices, ask_exit=True)
             if choice is None:
-                self.ui_manager.say(f'Input was not valid, please'
+                self.ui_manager.say('Input was not valid, please'
                                     ' enter a valid number!')
                 continue
             self.main_menu[choice][1]()
