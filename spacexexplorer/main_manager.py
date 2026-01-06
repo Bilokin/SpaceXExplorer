@@ -39,6 +39,10 @@ class MainManager(object):
         self.ui_manager.say(self.greeting)
         while True:
             msg = 'Choose an action by typing number and pressing ENTER:'
-            column = self.ui_manager.ask_user_choice(
+            choice = self.ui_manager.ask_user_choice(
                 msg, self.main_choices, ask_exit=True)
-            self.main_menu[column]()
+            print('Choice', choice)
+            if choice is None:
+                self.ui_manager.say(f'Answer {choice} not correct, please try again!')
+                continue
+            self.main_menu[choice][1]()

@@ -35,7 +35,7 @@ class TextUIOperator():
         return True
 
     def ask_user_choice(self, message: str, mlist: list, default: int = None,
-                        ask_exit: bool = False) -> int:
+                        ask_exit: bool = False) -> int | None:
         """
         Asks user to choose the value among the proposed ones.
         """
@@ -73,7 +73,7 @@ class TextUIOperator():
                 return default
             if answer == 'e':
                 sys.exit('Bye!')
-            self.say(f'Answer {answer} not correct, please try again!')
+            return None
 
     def add_spaces(self, strlist: list) -> list:
         """

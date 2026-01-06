@@ -38,6 +38,8 @@ class InfoManager(object):
                     f'File {path} not available, please run fetch_static()')
             with open(path, 'r') as f:
                 return json.load(f)
+        else:
+            raise NotImplementedError()
 
     def save_static(self, destination: str):
         """
