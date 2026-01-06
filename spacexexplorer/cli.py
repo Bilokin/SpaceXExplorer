@@ -7,6 +7,7 @@ from spacexexplorer.info_manager import InfoManager
 from spacexexplorer.main_manager import MainManager
 from spacexexplorer.textui_operator import TextUIOperator
 
+
 def main():  # pragma: no cover
     """
     The main function executes on commands:

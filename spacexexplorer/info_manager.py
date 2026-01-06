@@ -4,17 +4,19 @@ import pathlib
 
 import spacexpy
 
+
 class InfoManager(object):
     """InfoManager class that retrieves SpaceX data"""
+
     def __init__(self, location: str = "./"):
         self.spacex = spacexpy.SpaceX()
         self.location = pathlib.Path(location)
         self.static_file_dict = {'company': self.spacex.request_company,
-                      'launches': self.spacex.request_launches, 
-                      'landpads':  self.spacex.request_landpads, 
-                      'rockets': self.spacex.request_rockets
-                      }
-    
+                                 'launches': self.spacex.request_launches,
+                                 'landpads':  self.spacex.request_landpads,
+                                 'rockets': self.spacex.request_rockets
+                                 }
+
     def fetch_static(self):
         """
         Fetches the requested information from SpaceX API and
@@ -32,7 +34,8 @@ class InfoManager(object):
         if info_type in self.static_file_dict:
             path = self.location / f'{info_type}.json'
             if not os.path.exists(path):
-                raise FileNotFoundError(f'File {path} not available, please run fetch_static()')
+                raise FileNotFoundError(
+                    f'File {path} not available, please run fetch_static()')
             with open(path, 'r') as f:
                 return json.load(f)
 

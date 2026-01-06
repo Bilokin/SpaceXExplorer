@@ -1,9 +1,11 @@
 import sys
 
+
 class TextUIOperator():
     """
     Class that interacts with the user.
     """
+
     def __init__(self):
         """
         Constructor method.
@@ -31,10 +33,9 @@ class TextUIOperator():
         if answer == 'e':
             sys.exit('Bye!')
         return True
-    
 
     def ask_user_choice(self, message: str, mlist: list, default: int = None,
-                         ask_exit: bool = False) -> int:
+                        ask_exit: bool = False) -> int:
         """
         Asks user to choose the value among the proposed ones.
         """
@@ -48,20 +49,20 @@ class TextUIOperator():
                         self.say(f'{iteration}: {item} [default]')
                         continue
                     self.say(f'{iteration}: {item}')
-            else: #three column print
+            else:  # three column print
                 strlist = []
-                for i in range(0,list_length):
+                for i in range(0, list_length):
                     if default is not None and i == default:
                         strlist += [f'{i}: {mlist[i]} [default]']
                         continue
                     strlist += [f'{i}: {mlist[i]}']
                 strlist = self.add_spaces(strlist)
-                for a,b,c in zip(strlist[::3],strlist[1::3],strlist[2::3]):
-                    print('{}{}{}'.format(a,b,c))
-                if (len(strlist)%3 == 1):
+                for a, b, c in zip(strlist[::3], strlist[1::3], strlist[2::3]):
+                    print('{}{}{}'.format(a, b, c))
+                if (len(strlist) % 3 == 1):
                     print(strlist[-1])
-                if (len(strlist)%3 == 2):
-                    print('{}{}'.format(strlist[-2],strlist[-1]))
+                if (len(strlist) % 3 == 2):
+                    print('{}{}'.format(strlist[-2], strlist[-1]))
             if ask_exit:
                 self.say("To exit: please type 'e'")
             answer = input()
@@ -74,15 +75,13 @@ class TextUIOperator():
                 sys.exit('Bye!')
             self.say(f'Answer {answer} not correct, please try again!')
 
-    
-            
     def add_spaces(self, strlist: list) -> list:
         """
         Adds spaces to make columns.
         """
-        maxlen = len(max(strlist, key=len)) +1
-        return [ s.ljust(maxlen) for s in strlist]
-    
+        maxlen = len(max(strlist, key=len)) + 1
+        return [s.ljust(maxlen) for s in strlist]
+
     def is_int(self, s: str) -> bool:
         """
         Returns True if argument is integer.
