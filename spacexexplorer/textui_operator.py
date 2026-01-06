@@ -34,8 +34,8 @@ class TextUIOperator():
             sys.exit('Bye!')
         return True
 
-    def ask_user_choice(self, message: str, mlist: list, default: int = None,
-                        ask_exit: bool = False) -> int | None:
+    def ask_user_choice(self, message: str, mlist: list, default: int = -1,
+                        ask_exit: bool = False):
         """
         Asks user to choose the value among the proposed ones.
         """
@@ -52,7 +52,7 @@ class TextUIOperator():
             else:  # three column print
                 strlist = []
                 for i in range(0, list_length):
-                    if default is not None and i == default:
+                    if default > -1 and i == default:
                         strlist += [f'{i}: {mlist[i]} [default]']
                         continue
                     strlist += [f'{i}: {mlist[i]}']
@@ -69,7 +69,7 @@ class TextUIOperator():
             if self.is_int(answer):
                 if int(answer) < list_length:
                     return int(answer)
-            if not answer and default is not None:
+            if not answer and default > -1:
                 return default
             if answer == 'e':
                 sys.exit('Bye!')
