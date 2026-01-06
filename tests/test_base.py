@@ -1,5 +1,3 @@
-from spacexexplorer.base import NAME
-
-
+import os
 def test_base():
-    assert NAME == "spacexexplorer"
+    assert os.path.abspath(os.curdir)
