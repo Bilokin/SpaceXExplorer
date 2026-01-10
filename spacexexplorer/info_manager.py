@@ -14,11 +14,14 @@ class InfoManager(object):
     def __init__(self, location: str = "./"):
         self.spacex = spacexpy.SpaceX()
         self.location = pathlib.Path(location)
-        self.static_file_dict = {'company': self.spacex.request_company,
-                                 'launches': self.spacex.request_launches,
-                                 'landpads':  self.spacex.request_landpads,
-                                 'rockets': self.spacex.request_rockets
+        self.static_file_dict = {"company": self.spacex.request_company,
+                                 "launches": self.spacex.request_launches,
+                                 "landpads":  self.spacex.request_landpads,
+                                 "launchpads":  self.spacex.request_launchpads,
+                                 "rockets": self.spacex.request_rockets
                                  }
+        self.launchpad_info: dict = {}
+        self.rocket_info: dict = {}
 
     def fetch_static(self):
         """
@@ -30,6 +33,13 @@ class InfoManager(object):
                 with open(self.location / f'{filename}.json', 'w') as f:
                     data = self.static_file_dict[filename]()
                     json.dump(data, f, indent='    ')
+                    if filename == "launchpads":
+                        for launchpad in data:
+                            self.launchpad_info[launchpad["id"]
+                                                ] = launchpad.get("full_name")
+                    if filename == "rockets":
+                        for rocket in data:
+                            self.rocket_info[rocket["id"]] = rocket.get("name")
         except ClientConnectorError:
             sys.exit(
                 "No access to SpaceX API, please check your internet connection!")

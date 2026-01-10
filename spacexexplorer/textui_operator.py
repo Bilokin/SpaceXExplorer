@@ -1,3 +1,4 @@
+import os
 import sys
 
 
@@ -11,6 +12,13 @@ class TextUIOperator():
         Constructor method.
         """
         self.column_limit = 10
+
+    def clear(self) -> None:
+        """
+        Clears the terminal
+        """
+        os.system('cls||clear')
+
 
     def say(self, message: str) -> None:
         """

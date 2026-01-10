@@ -1,6 +1,6 @@
 # SpaceX Explorer Project
 
-A Python application that tracks and analyzes SpaceX launches using their public API. 
+An interactive Python application that tracks and analyzes SpaceX launches using their public API. 
 The application should help users understand launch history, track statistics, and monitor mission details.
 
 ## Install it from PyPI
@@ -9,15 +9,10 @@ The application should help users understand launch history, track statistics, a
 pip install spacexexplorer
 ```
 
+
 ## Usage
 
-```py
-from spacexexplorer import BaseClass
-from spacexexplorer import base_function
-
-BaseClass().base_method()
-base_function()
-```
+Launch the program:
 
 ```bash
 $ python -m spacexexplorer
@@ -25,6 +20,14 @@ $ python -m spacexexplorer
 $ spacexexplorer
 ```
 
-## Development
+Then one can navigate menu by entering numbers:
 
-Read the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+```
+Choose an action by typing a number and pressing [ENTER]:
+0: About company
+1: Browse launches
+2: Browse launchpads
+3: Browse rockets
+To exit: please type 'e'
+```
+
