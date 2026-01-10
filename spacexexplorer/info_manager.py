@@ -1,7 +1,7 @@
 import os
 import json
 import pathlib
-
+from typing import Any
 import spacexpy
 
 
@@ -27,7 +27,7 @@ class InfoManager(object):
                 data = self.static_file_dict[filename]()
                 json.dump(data, f, indent='    ')
 
-    def get(self, info_type: str, **kw_args) -> object:
+    def get(self, info_type: str, **kw_args) -> Any:
         """
         Returns info from static or dynamic sources
         """
@@ -40,6 +40,24 @@ class InfoManager(object):
                 return json.load(f)
         else:
             raise NotImplementedError()
+
+    def filter_launches(self, **filters) -> list:
+        """
+        Filters the launch list
+        """
+        info = self.get("launches")
+        if len(filters) < 1:
+            return info
+        filtered = []
+        for launch in info:
+            accepted = True
+            for key in filters:
+                if launch[key] != filters[key]:
+                    accepted = False
+                    break
+            if accepted:
+                filtered.append(launch)
+        return filtered
 
     def save_static(self, destination: str):
         """
