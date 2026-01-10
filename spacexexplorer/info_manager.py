@@ -1,8 +1,11 @@
 import os
+import sys
 import json
 import pathlib
 from typing import Any
 import spacexpy
+
+from aiohttp.client_exceptions import ClientConnectorError
 
 
 class InfoManager(object):
@@ -22,10 +25,14 @@ class InfoManager(object):
         Fetches the requested information from SpaceX API and
         stores it in JSON files for further use
         """
-        for filename in self.static_file_dict:
-            with open(self.location / f'{filename}.json', 'w') as f:
-                data = self.static_file_dict[filename]()
-                json.dump(data, f, indent='    ')
+        try:
+            for filename in self.static_file_dict:
+                with open(self.location / f'{filename}.json', 'w') as f:
+                    data = self.static_file_dict[filename]()
+                    json.dump(data, f, indent='    ')
+        except ClientConnectorError:
+            sys.exit(
+                "No access to SpaceX API, please check your internet connection!")
 
     def get(self, info_type: str, **kw_args) -> Any:
         """
@@ -35,7 +42,7 @@ class InfoManager(object):
             path = self.location / f'{info_type}.json'
             if not os.path.exists(path):
                 raise FileNotFoundError(
-                    f'File {path} not available, please run fetch_static()')
+                    f'File {path} not available, please relaunch the program')
             with open(path, 'r') as f:
                 return json.load(f)
         else:
