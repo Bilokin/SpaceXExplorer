@@ -1,12 +1,11 @@
-"""CLI interface for spacexexplorer project.
-
-Be creative! do whatever you want!
-
-- Install click or typer and create a CLI app
-- Use builtin argparse
-- Start a web application
-- Import things from your .base module
 """
+CLI interface for spacexexplorer project.
+"""
+import tempfile
+
+from spacexexplorer.info_manager import InfoManager
+from spacexexplorer.main_manager import MainManager
+from spacexexplorer.textui_operator import TextUIOperator
 
 
 def main():  # pragma: no cover
@@ -14,15 +13,12 @@ def main():  # pragma: no cover
     The main function executes on commands:
     `python -m spacexexplorer` and `$ spacexexplorer `.
 
-    This is your program's entry point.
-
-    You can change this function to do whatever you want.
-    Examples:
-        * Run a test suite
-        * Run a server
-        * Do some other stuff
-        * Run a command line application (Click, Typer, ArgParse)
-        * List all available tasks
-        * Run an application (Flask, FastAPI, Django, etc.)
+    This is spacexexplorer entry point.
     """
-    print("This will do something")
+
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        info_manager = InfoManager(location=tmpdirname)
+        info_manager.fetch_static()
+        ui_manager = TextUIOperator()
+        main = MainManager(info_manager, ui_manager)
+        main.main_loop()
