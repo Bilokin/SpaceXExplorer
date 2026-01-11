@@ -1,6 +1,8 @@
 import os
 import sys
 
+from typing import Optional
+
 
 class TextUIManager():
     """
@@ -120,7 +122,7 @@ class TextUIManager():
         
         self.separator()
 
-    def ask_user_choice(self, message: str, mlist: list, default: int = -1,
+    def ask_user_choice(self, message: str, mlist: list, default: Optional[int] = None,
                         ask_exit: bool = False):
         """
         Asks user to choose the value among the proposed ones.
@@ -138,7 +140,7 @@ class TextUIManager():
             else:  # three column print
                 strlist = []
                 for i in range(0, list_length):
-                    if default > -1 and i == default:
+                    if default is not None and i == default:
                         strlist += [f'{i}: {mlist[i]} [default]']
                         continue
                     strlist += [f'{i}: {mlist[i]}']
@@ -153,9 +155,9 @@ class TextUIManager():
                 self.say("To exit: please type 'e'")
             answer = input()
             if self.is_int(answer):
-                if int(answer) < list_length:
+                if abs(int(answer)) < list_length:
                     return int(answer)
-            if not answer and default > -1:
+            if not answer and default is None:
                 return default
             if answer == 'e':
                 sys.exit('Bye!')

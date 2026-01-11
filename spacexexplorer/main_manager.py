@@ -1,19 +1,20 @@
 from spacexexplorer.info_manager import InfoManager
 from spacexexplorer.textui_manager import TextUIManager
 
+from typing import Callable, Any, Optional
+
+
 class MenuItem(object):
     """Simple Menu Item class"""
-    def __init__(self, display_name: str, call_function, arguments: dict = None):
+    def __init__(self, display_name: str, call_function: Callable, arguments: Optional[dict] = None):
         self.display_name = display_name
         self.call_function = call_function
-        self.arguments = arguments
-        if self.arguments is None:
-            self.arguments = {}
+        self.arguments = arguments or {}
     
-    def __call__(self, *args):
+    def __call__(self, *args) -> Any:
         return self.call_function(*args, **self.arguments)
     
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.display_name
 
 class MainManager(object):
