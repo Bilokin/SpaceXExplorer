@@ -55,14 +55,14 @@ def test_filter_launches():
 def test_rocket_stats():
     info_manager = InfoManager()
     def get_launches():
-        launches_objs = [{"success": True, "rocket": 1, "launchpad": 1},
-                        {"success": True, "rocket": 1, "launchpad": 1},
-                        {"success": False, "rocket": 1, "launchpad": 1},
-                        {"success": False, "rocket": 2, "launchpad": 1},
-                        {"success": False, "rocket": 2, "launchpad": 1},
-                        {"success": True, "rocket": 1, "launchpad": 1},
-                        {"success": True, "rocket": 2, "launchpad": 1},
-                        {"success": True, "rocket": 2, "launchpad": 1},
+        launches_objs = [{"success": True, "rocket": 1, "launchpad": 1, "date_utc": "2006-03-24T22:30:00.000Z"},
+                        {"success": True, "rocket": 1, "launchpad": 1, "date_utc": "2007-04-24T22:30:00.000Z"},
+                        {"success": False, "rocket": 1, "launchpad": 1, "date_utc": "2008-05-24T22:30:00.000Z"},
+                        {"success": False, "rocket": 2, "launchpad": 1, "date_utc": "2009-06-24T22:30:00.000Z"},
+                        {"success": False, "rocket": 2, "launchpad": 1, "date_utc": "2010-07-24T22:30:00.000Z"},
+                        {"success": True, "rocket": 1, "launchpad": 1, "date_utc": "2010-07-24T22:30:00.000Z"},
+                        {"success": True, "rocket": 2, "launchpad": 1, "date_utc": "2010-07-24T22:30:00.000Z"},
+                        {"success": True, "rocket": 2, "launchpad": 1, "date_utc": "2010-07-24T22:30:00.000Z"},
         ]
         return launches_objs
     def get_rockets():
