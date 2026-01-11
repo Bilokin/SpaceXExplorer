@@ -1,6 +1,8 @@
 import os
 import sys
 
+from typing import Optional
+
 
 class TextUIManager():
     """
@@ -12,6 +14,8 @@ class TextUIManager():
         Constructor method.
         """
         self.column_limit = 10
+        self.exit_symbol = "e"
+        self.sep_str = '='*80
         self.month_names = ["Jan", "Feb", "Mar",
                             "Apl", "May", "Jun",
                             "Jul", "Aug", "Sep",
@@ -33,15 +37,15 @@ class TextUIManager():
         """
         Prints a separator.
         """
-        print('=============================================')
+        print(self.sep_str)
 
     def ask_continue_or_exit(self) -> bool:
         """
         Asks user if we want to continue the main loop
         """
-        self.say("To continue press Enter, to exit please type 'e'")
+        self.say(f"To continue press Enter, to exit please type '{self.exit_symbol}'")
         answer = input()
-        if answer == 'e':
+        if answer == self.exit_symbol:
             sys.exit('Bye!')
         return True
     
@@ -120,7 +124,7 @@ class TextUIManager():
         
         self.separator()
 
-    def ask_user_choice(self, message: str, mlist: list, default: int = -1,
+    def ask_user_choice(self, message: str, mlist: list, default: Optional[int] = None,
                         ask_exit: bool = False):
         """
         Asks user to choose the value among the proposed ones.
@@ -130,7 +134,7 @@ class TextUIManager():
             self.say(message)
             # single column print:
             if (len(mlist) < self.column_limit):
-                for item, iteration in zip(mlist, range(0, list_length)):
+                for iteration, item  in enumerate(mlist):
                     if iteration == default:
                         self.say(f'{iteration}: {item} [default]')
                         continue
@@ -138,7 +142,7 @@ class TextUIManager():
             else:  # three column print
                 strlist = []
                 for i in range(0, list_length):
-                    if default > -1 and i == default:
+                    if default is not None and i == default:
                         strlist += [f'{i}: {mlist[i]} [default]']
                         continue
                     strlist += [f'{i}: {mlist[i]}']
@@ -150,14 +154,14 @@ class TextUIManager():
                 if (len(strlist) % 3 == 2):
                     print('{}{}'.format(strlist[-2], strlist[-1]))
             if ask_exit:
-                self.say("To exit: please type 'e'")
+                self.say(f"To exit: please type '{self.exit_symbol}'")
             answer = input()
             if self.is_int(answer):
-                if int(answer) < list_length:
+                if abs(int(answer)) < list_length:
                     return int(answer)
-            if not answer and default > -1:
+            if not answer and default is None:
                 return default
-            if answer == 'e':
+            if answer == self.exit_symbol:
                 sys.exit('Bye!')
             return None
 

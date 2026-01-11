@@ -1,6 +1,21 @@
 from spacexexplorer.info_manager import InfoManager
 from spacexexplorer.textui_manager import TextUIManager
 
+from typing import Callable, Any, Optional
+
+
+class MenuItem(object):
+    """Simple Menu Item class"""
+    def __init__(self, display_name: str, call_function: Callable, arguments: Optional[dict] = None):
+        self.display_name = display_name
+        self.call_function = call_function
+        self.arguments = arguments or {}
+    
+    def __call__(self, *args) -> Any:
+        return self.call_function(*args, **self.arguments)
+    
+    def __repr__(self) -> str:
+        return self.display_name
 
 class MainManager(object):
     """
@@ -10,40 +25,37 @@ class MainManager(object):
     def __init__(self, info_manager: InfoManager, ui_manager: TextUIManager):
         self.info_manager = info_manager
         self.ui_manager = ui_manager
-        self.to_exit = False
         self.greeting = "This is a SpaceX info app"
         self.define_menus()
 
     def define_menus(self):
-        self.main_menu = [("About company", self.about_info),
-                          ("Browse launches", self.launches_loop),
-                          ("Browse launchpads", self.show_launchpads_menu),
-                          ("Browse rockets", self.show_rockets_menu),
-                          ("Show launch statistics", self.show_launch_stats)
+        self.main_menu = [MenuItem("About company", self.about_info),
+                          MenuItem("Browse launches", self.show_launches_menu),
+                          MenuItem("Browse launchpads", self.show_launchpads_menu),
+                          MenuItem("Browse rockets", self.show_rockets_menu),
+                          MenuItem("Show launch statistics", self.show_launch_stats)
                           ]
-        self.main_choices = [m[0] for m in self.main_menu]
 
         self.launches_menu = [
-            ("All", self.info_manager.filter_launches, {}),
-            ("Successful", self.info_manager.filter_launches,
+            MenuItem("All", self.info_manager.filter_launches, {}),
+            MenuItem("Successful", self.info_manager.filter_launches,
              {"success": True}),
-            ("Failed", self.info_manager.filter_launches,
+            MenuItem("Failed", self.info_manager.filter_launches,
              {"success": False})
         ]
         for rocket_id in self.info_manager.rocket_info:
             name = self.info_manager.rocket_info[rocket_id]['name']
-            item = (f"By {name} rocket",
+            item = MenuItem(f"By {name} rocket",
                     self.info_manager.filter_launches,
                     {"rocket": rocket_id})
             self.launches_menu.append(item)
         for launchpad_id in self.info_manager.launchpad_info:
             name = self.info_manager.launchpad_info[launchpad_id]["name"]
-            item = (f"By {name}",
+            item = MenuItem(f"By {name}",
                     self.info_manager.filter_launches,
                     {"launchpad": launchpad_id})
             self.launches_menu.append(item)
 
-        self.launch_choices = [m[0] for m in self.launches_menu]
 
     def about_info(self) -> None:
         """
@@ -85,6 +97,10 @@ class MainManager(object):
                 break
 
     def show_rockets_menu(self) -> None:
+        """
+        Creates an infinite loop until the user or an
+        external condition breaks it.
+        """
         msg = '\nChoose a rocket by typing a number and pressing [ENTER]:'
         all_rockets = self.info_manager.get("rockets")
         rockets_menu = [self.info_manager.rocket_info[key]['name']
@@ -107,17 +123,20 @@ class MainManager(object):
                                                             rocket_success_rate=rocket_success_rate)
                 break
 
-    def launches_loop(self) -> None:
+    def show_launches_menu(self) -> None:
+        """
+        Creates an infinite loop until the user or an
+        external condition breaks it.
+        """
         msg = '\nChoose an action by typing a number and pressing [ENTER]:'
         while True:
             choice = self.ui_manager.ask_user_choice(
-                msg, self.launch_choices, ask_exit=True)
+                msg, self.launches_menu, ask_exit=True)
             if choice is None:
                 self.ui_manager.say('Input was not valid, please'
                                     ' enter a valid number!')
                 continue
-            filtered = self.launches_menu[choice][1](
-                **self.launches_menu[choice][2])
+            filtered = self.launches_menu[choice]()
             if len(filtered) < 1:
                 self.ui_manager.separator()
                 self.ui_manager.say("No launches found!")
@@ -146,9 +165,9 @@ class MainManager(object):
         msg = '\nChoose an action by typing a number and pressing [ENTER]:'
         while True:
             choice = self.ui_manager.ask_user_choice(
-                msg, self.main_choices, ask_exit=True)
+                msg, self.main_menu, ask_exit=True)
             if choice is None:
                 self.ui_manager.say('Input was not valid, please'
                                     ' enter a valid number!')
                 continue
-            self.main_menu[choice][1]()
+            self.main_menu[choice]()
