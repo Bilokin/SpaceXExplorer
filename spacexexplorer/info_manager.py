@@ -15,15 +15,41 @@ class InfoManager(object):
         self.spacex = spacexpy.SpaceX()
         self.location = pathlib.Path(location)
         self.static_file_dict = {"company": self.spacex.request_company,
-                                 "launches": self.spacex.request_launches,
                                  "landpads":  self.spacex.request_landpads,
                                  "launchpads":  self.spacex.request_launchpads,
-                                 "rockets": self.spacex.request_rockets
+                                 "rockets": self.spacex.request_rockets,
+                                 "launches": self.spacex.request_launches  # keep as last one for statistics
                                  }
         self.launchpad_info: dict = {}
         self.rocket_info: dict = {}
+        self.launch_stats: dict = {"years": {}, "months": {}}
 
-    def fetch_static(self):
+    def record_launch(self, launch: dict) -> None:
+        """
+        Records launch stats
+        """
+        if launch['success']:
+            self.launchpad_info[launch['launchpad']
+                                ]['successful_launches'] += 1
+            self.rocket_info[launch['rocket']
+                                ]['successful_launches'] += 1
+        self.launchpad_info[launch['launchpad']
+                            ]['total_launches'] += 1
+        self.rocket_info[launch['rocket']
+                            ]['total_launches'] += 1
+        year, month, _ = launch["date_utc"].split('T')[0].split('-')
+        year = int(year)
+        month = int(month)
+        if year in self.launch_stats["years"]:
+            self.launch_stats["years"][year] += 1
+        else:
+            self.launch_stats["years"][year] = 1
+        if month in self.launch_stats["months"]:
+            self.launch_stats["months"][month] += 1
+        else:
+            self.launch_stats["months"][month] = 1
+
+    def fetch_static(self) -> None:
         """
         Fetches the requested information from SpaceX API and
         stores it in JSON files for further use
@@ -36,10 +62,17 @@ class InfoManager(object):
                     if filename == "launchpads":
                         for launchpad in data:
                             self.launchpad_info[launchpad["id"]
-                                                ] = launchpad.get("full_name")
+                                                ] = {"name": launchpad.get("full_name"),
+                                                     "successful_launches": 0,
+                                                     "total_launches": 0}
                     if filename == "rockets":
                         for rocket in data:
-                            self.rocket_info[rocket["id"]] = rocket.get("name")
+                            self.rocket_info[rocket["id"]] = {"name": rocket.get("name"),
+                                                              "successful_launches": 0,
+                                                              "total_launches": 0}
+                    if filename == "launches":
+                        for launch in data:
+                            self.record_launch(launch)
         except ClientConnectorError:
             sys.exit(
                 "No access to SpaceX API, please check your internet connection!")

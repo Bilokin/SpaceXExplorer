@@ -2,7 +2,7 @@ import os
 import sys
 
 
-class TextUIOperator():
+class TextUIManager():
     """
     Class that interacts with the user.
     """
@@ -12,13 +12,16 @@ class TextUIOperator():
         Constructor method.
         """
         self.column_limit = 10
+        self.month_names = ["Jan", "Feb", "Mar",
+                            "Apl", "May", "Jun",
+                            "Jul", "Aug", "Sep",
+                            "Oct", "Nov", "Dec"]
 
     def clear(self) -> None:
         """
         Clears the terminal
         """
         os.system('cls||clear')
-
 
     def say(self, message: str) -> None:
         """
@@ -41,6 +44,81 @@ class TextUIOperator():
         if answer == 'e':
             sys.exit('Bye!')
         return True
+    
+    def show_launch_stats(self, yearly: list, monthly: list) -> None:
+        """
+        Prints launch stats
+        """
+        self.say("Statistics by years:")
+        title_row = "|"
+        value_row = "|"
+        for year, val in yearly:
+            title_row += str(year) + "|"
+            value_row += str(val).ljust(4) + "|"
+        self.say(title_row)
+        self.say(value_row)
+        self.say("Statistics by months:")
+        title_row = "|"
+        value_row = "|"
+        for month, val in monthly:
+            title_row += str(self.month_names[month-1]).ljust(4) + "|"
+            value_row += str(val).ljust(4) + "|"
+        self.say(title_row)
+        self.say(value_row)
+
+    def show_single_launchpad_info(self, launchpad: dict, **extra_info) -> None:
+        """
+        Prints a single launchpad info
+        """
+        self.separator()
+        self.say("Launchpad information")
+        self.separator()
+        properties = ['full_name', 'locality',
+                      'region', 'status',
+                      'launch_successes', 'launch_attempts',
+                      'details'
+                      ]
+        for prop in properties:
+            self.say(
+                f"{prop.capitalize().replace('_', ' ')}: {launchpad.get(prop)}")
+        self.separator()
+
+    def show_single_rocket_info(self, rocket: dict, **extra_info) -> None:
+        """
+        Prints a signal rocket info
+        """
+        self.separator()
+        self.say("Rocket information")
+        self.separator()
+        properties = ['name', 'type',
+                      'active', 'stages',
+                      'description']
+        for prop in properties:
+            self.say(
+                f"{prop.capitalize().replace('_', ' ')}: {rocket.get(prop)}")
+        rocket_success_rate = extra_info.get("rocket_success_rate")
+        if rocket_success_rate:
+            self.say(f"Rocket success rate: {rocket_success_rate: 0.1f}%")
+        self.separator()
+
+    def show_single_launch_info(self, launch: dict, **extra_info) -> None:
+        """
+        Prints a single launch info
+        """
+        properties = ['date_local', 'flight_number',
+                      'name', 'success', 'reused',
+                      'landing_success',  'details']
+        self.separator()
+        self.say("Launch information")
+        self.separator()
+        rocket_name = extra_info.get("rocket_name")
+        if rocket_name:
+            self.say(f"Rocket: {rocket_name}")
+        for prop in properties:
+            self.say(
+                f"{prop.capitalize().replace('_', ' ')}: {launch.get(prop)}")
+        
+        self.separator()
 
     def ask_user_choice(self, message: str, mlist: list, default: int = -1,
                         ask_exit: bool = False):

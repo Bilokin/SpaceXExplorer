@@ -1,5 +1,5 @@
 from spacexexplorer.info_manager import InfoManager
-from spacexexplorer.textui_operator import TextUIOperator
+from spacexexplorer.textui_manager import TextUIManager
 
 
 class MainManager(object):
@@ -7,7 +7,7 @@ class MainManager(object):
     Main manager class that controls the execution loop
     """
 
-    def __init__(self, info_manager: InfoManager, ui_manager: TextUIOperator):
+    def __init__(self, info_manager: InfoManager, ui_manager: TextUIManager):
         self.info_manager = info_manager
         self.ui_manager = ui_manager
         self.to_exit = False
@@ -18,7 +18,8 @@ class MainManager(object):
         self.main_menu = [("About company", self.about_info),
                           ("Browse launches", self.launches_loop),
                           ("Browse launchpads", self.show_launchpads_menu),
-                          ("Browse rockets", self.show_rockets_menu)
+                          ("Browse rockets", self.show_rockets_menu),
+                          ("Show launch statistics", self.show_launch_stats)
                           ]
         self.main_choices = [m[0] for m in self.main_menu]
 
@@ -30,17 +31,18 @@ class MainManager(object):
              {"success": False})
         ]
         for rocket_id in self.info_manager.rocket_info:
-            name = self.info_manager.rocket_info[rocket_id]
+            name = self.info_manager.rocket_info[rocket_id]['name']
             item = (f"By {name} rocket",
                     self.info_manager.filter_launches,
                     {"rocket": rocket_id})
             self.launches_menu.append(item)
         for launchpad_id in self.info_manager.launchpad_info:
-            name = self.info_manager.launchpad_info[launchpad_id]
+            name = self.info_manager.launchpad_info[launchpad_id]["name"]
             item = (f"By {name}",
                     self.info_manager.filter_launches,
                     {"launchpad": launchpad_id})
             self.launches_menu.append(item)
+
         self.launch_choices = [m[0] for m in self.launches_menu]
 
     def about_info(self) -> None:
@@ -54,25 +56,22 @@ class MainManager(object):
         for prop in properties:
             self.ui_manager.say(f"{prop.capitalize()}: {info.get(prop)}")
         self.ui_manager.separator()
-
-    def show_single_launchpad_info(self, launchpad: dict) -> None:
-        self.ui_manager.separator()
-        self.ui_manager.say("Launchpad information")
-        self.ui_manager.separator()
-        properties = ['full_name', 'locality',
-                      'region', 'status',
-                      'launch_attempts', 'launch_successes',
-                      'details'
-                      ]
-        for prop in properties:
-            self.ui_manager.say(
-                f"{prop.capitalize().replace('_', ' ')}: {launchpad.get(prop)}")
-        self.ui_manager.separator()
+    
+    def show_launch_stats(self) -> None:
+        """
+        Prints launch stats
+        """
+        yearly = sorted([(k, v) for k, v in self.info_manager.launch_stats["years"].items()])
+        monthly = sorted([(k, v) for k, v in self.info_manager.launch_stats["months"].items()])
+        self.ui_manager.show_launch_stats(yearly, monthly)
 
     def show_launchpads_menu(self) -> None:
+        """
+        Prints launchpad menu
+        """
         msg = "\nChoose a launchpad by typing a number and pressing [ENTER]:"
         all_lps = self.info_manager.get("launchpads")
-        lps_menu = [self.info_manager.launchpad_info[key]
+        lps_menu = [self.info_manager.launchpad_info[key]["name"]
                     for key in self.info_manager.launchpad_info]
         choice = self.ui_manager.ask_user_choice(
             msg, lps_menu, ask_exit=True)
@@ -82,25 +81,13 @@ class MainManager(object):
             return
         for lp in all_lps:
             if lp.get('full_name') == lps_menu[choice]:
-                self.show_single_launchpad_info(lp)
+                self.ui_manager.show_single_launchpad_info(lp)
                 break
-
-    def show_single_rocket_info(self, rocket: dict) -> None:
-        self.ui_manager.separator()
-        self.ui_manager.say("Rocket information")
-        self.ui_manager.separator()
-        properties = ['name', 'type',
-                      'active', 'stages', 'reusable',
-                      'description']
-        for prop in properties:
-            self.ui_manager.say(
-                f"{prop.capitalize().replace('_', ' ')}: {rocket.get(prop)}")
-        self.ui_manager.separator()
 
     def show_rockets_menu(self) -> None:
         msg = '\nChoose a rocket by typing a number and pressing [ENTER]:'
         all_rockets = self.info_manager.get("rockets")
-        rockets_menu = [self.info_manager.rocket_info[key]
+        rockets_menu = [self.info_manager.rocket_info[key]['name']
                         for key in self.info_manager.rocket_info]
         choice = self.ui_manager.ask_user_choice(
             msg, rockets_menu, ask_exit=True)
@@ -110,22 +97,15 @@ class MainManager(object):
             return
         for rocket in all_rockets:
             if rocket.get('name') == rockets_menu[choice]:
-                self.show_single_rocket_info(rocket)
+                extras = self.info_manager.rocket_info[rocket["id"]]
+                rocket_successes = extras['successful_launches']
+                rocket_total = extras['total_launches']
+                rocket_success_rate = None
+                if rocket_total > 0:
+                    rocket_success_rate = rocket_successes / rocket_total * 100
+                self.ui_manager.show_single_rocket_info(rocket, 
+                                                            rocket_success_rate=rocket_success_rate)
                 break
-
-    def show_single_launch_info(self, launch: dict) -> None:
-        properties = ['date_local', 'flight_number',
-                      'name', 'success', 'reused',
-                      'landing_success',  'details']
-        self.ui_manager.separator()
-        self.ui_manager.say("Launch information")
-        self.ui_manager.separator()
-        rocket_name = self.info_manager.rocket_info.get(launch.get('rocket'))
-        self.ui_manager.say(f"Rocket: {rocket_name}")
-        for prop in properties:
-            self.ui_manager.say(
-                f"{prop.capitalize().replace('_', ' ')}: {launch.get(prop)}")
-        self.ui_manager.separator()
 
     def launches_loop(self) -> None:
         msg = '\nChoose an action by typing a number and pressing [ENTER]:'
@@ -152,7 +132,9 @@ class MainManager(object):
                 self.ui_manager.say('Input was not valid, please'
                                     ' enter a valid number!')
             else:
-                self.show_single_launch_info(filtered[choice_launch])
+                rocket_name = self.info_manager.rocket_info[filtered[choice_launch].get('rocket')]['name']
+                self.ui_manager.show_single_launch_info(
+                    filtered[choice_launch], rocket_name=rocket_name)
                 break
 
     def main_loop(self) -> None:
