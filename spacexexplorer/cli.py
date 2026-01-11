@@ -5,7 +5,7 @@ import tempfile
 
 from spacexexplorer.info_manager import InfoManager
 from spacexexplorer.main_manager import MainManager
-from spacexexplorer.textui_operator import TextUIOperator
+from spacexexplorer.textui_manager import TextUIManager
 
 
 def main():  # pragma: no cover
@@ -19,6 +19,6 @@ def main():  # pragma: no cover
     with tempfile.TemporaryDirectory() as tmpdirname:
         info_manager = InfoManager(location=tmpdirname)
         info_manager.fetch_static()
-        ui_manager = TextUIOperator()
+        ui_manager = TextUIManager()
         main = MainManager(info_manager, ui_manager)
         main.main_loop()
