@@ -25,7 +25,6 @@ class MainManager(object):
     def __init__(self, info_manager: InfoManager, ui_manager: TextUIManager):
         self.info_manager = info_manager
         self.ui_manager = ui_manager
-        self.to_exit = False
         self.greeting = "This is a SpaceX info app"
         self.define_menus()
 
